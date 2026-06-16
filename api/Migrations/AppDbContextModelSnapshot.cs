@@ -35,6 +35,9 @@ namespace api.Migrations
                     b.Property<DateOnly?>("AppliedDate")
                         .HasColumnType("date");
 
+                    b.Property<DateOnly?>("InterviewDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(150)

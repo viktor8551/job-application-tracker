@@ -16,6 +16,8 @@ public record CreateJobApplicationRequest(
 
     DateOnly? AppliedDate = null,
 
+    DateOnly? InterviewDate = null,
+
     [MaxLength(2048)]
     string? JobUrl = null,
 

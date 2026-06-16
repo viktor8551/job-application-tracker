@@ -25,6 +25,7 @@ public class JobApplicationService(
         application.PositionTitle = request.PositionTitle;
         application.Status = request.Status;
         application.AppliedDate = request.AppliedDate;
+        application.InterviewDate = request.InterviewDate;
         application.JobUrl = request.JobUrl;
         application.Notes = request.Notes;
 
@@ -58,6 +59,7 @@ public class JobApplicationService(
             PositionTitle = request.PositionTitle,
             Status = request.Status,
             AppliedDate = request.AppliedDate,
+            InterviewDate = request.InterviewDate,
             JobUrl = request.JobUrl,
             Notes = request.Notes
         };
@@ -93,6 +95,7 @@ public class JobApplicationService(
             application.PositionTitle,
             application.Status,
             application.AppliedDate,
+            application.InterviewDate,
             application.JobUrl,
             application.Notes,
             application.CreatedAt

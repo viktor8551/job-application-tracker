@@ -8,6 +8,7 @@ public record JobApplicationResponse(
     string PositionTitle,
     ApplicationStatus Status,
     DateOnly? AppliedDate,
+    DateOnly? InterviewDate,
     string? JobUrl,
     string? Notes,
     DateTime CreatedAt
