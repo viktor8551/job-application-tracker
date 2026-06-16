@@ -77,17 +77,18 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
     }
 
     [Fact]
-    public async Task UpdateJobApplicationAsync_UpdatesFieldsAndSetsAppliedDateWhenNewlyApplied()
+    public async Task UpdateJobApplicationAsync_UpdatesFields()
     {
         await using var db = fixture.CreateDbContext();
         var user = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, user.Id, "Before Company");
         var service = new JobApplicationService(db);
-        var beforeUpdate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var appliedDate = new DateOnly(2026, 6, 15);
         var request = new UpdateJobApplicationRequest(
             "After Company",
             "Full Stack Developer",
             ApplicationStatus.Applied,
+            appliedDate,
             JobUrl: "https://findjobs.com/updated",
             Notes: "Applied today");
 
@@ -99,8 +100,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         Assert.Equal(ApplicationStatus.Applied, result.Status);
         Assert.Equal("https://findjobs.com/updated", result.JobUrl);
         Assert.Equal("Applied today", result.Notes);
-        Assert.NotNull(result.AppliedDate);
-        Assert.True(result.AppliedDate >= beforeUpdate);
+        Assert.Equal(appliedDate, result.AppliedDate);
     }
 
     [Fact]

@@ -24,13 +24,9 @@ public class JobApplicationService(
         application.CompanyName = request.CompanyName;
         application.PositionTitle = request.PositionTitle;
         application.Status = request.Status;
+        application.AppliedDate = request.AppliedDate;
         application.JobUrl = request.JobUrl;
         application.Notes = request.Notes;
-
-        if (application.Status == ApplicationStatus.Applied && application.AppliedDate is null)
-        {
-            application.AppliedDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        }
 
         await _db.SaveChangesAsync();
 

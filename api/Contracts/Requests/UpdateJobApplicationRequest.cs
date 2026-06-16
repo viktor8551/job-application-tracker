@@ -14,6 +14,8 @@ public record UpdateJobApplicationRequest(
 
     ApplicationStatus Status,
 
+    DateOnly? AppliedDate = null,
+
     [MaxLength(2048)]
     string? JobUrl = null,
 
