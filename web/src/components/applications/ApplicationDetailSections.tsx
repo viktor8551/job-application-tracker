@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { applicationStatuses } from "@/lib/application-constants"
-import { formatDate, normalizeJobUrl } from "@/lib/application-utils"
+import { formatDate, formatDateTime, normalizeJobUrl } from "@/lib/application-utils"
 import type { ApplicationStatus, JobApplication } from "@/types/applications"
 import {
   CalendarBlankIcon,
@@ -181,11 +181,11 @@ export function ApplicationInfoSection({
             ) : null}
 
             {showInterviewDate ? (
-              <Field label="Interview date">
+              <Field label="Interview date and time">
                 <Input
                   value={interviewDate}
                   onChange={(event) => onInterviewDateChange(event.target.value)}
-                  type="date"
+                  type="datetime-local"
                 />
               </Field>
             ) : null}
@@ -218,7 +218,7 @@ export function ApplicationInfoSection({
           {application.status === "Interviewing" ? (
             <ReadField
               label="Interview"
-              value={formatDate(application.interviewDate)}
+              value={formatDateTime(application.interviewDate)}
             />
           ) : null}
           <ReadField

@@ -8,7 +8,7 @@ public class JobApplication {
     public string PositionTitle { get; set; } = string.Empty;
     public ApplicationStatus Status { get; set; } = ApplicationStatus.Interested;
     public DateOnly? AppliedDate { get; set; }
-    public DateOnly? InterviewDate { get; set; }
+    public DateTime? InterviewDate { get; set; }
     public string? JobUrl { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }

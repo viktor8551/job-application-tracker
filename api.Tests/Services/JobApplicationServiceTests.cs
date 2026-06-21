@@ -26,7 +26,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
             "This Company",
             "Backend Developer",
             ApplicationStatus.Interested,
-            InterviewDate: new DateOnly(2026, 6, 20),
+            InterviewDate: new DateTime(2026, 6, 20, 13, 45, 0),
             JobUrl: "https://findjobs.com/job",
             Notes: "I Really want this job!");
 
@@ -38,7 +38,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         Assert.Equal("This Company", result.CompanyName);
         Assert.Equal("Backend Developer", result.PositionTitle);
         Assert.Equal(ApplicationStatus.Interested, result.Status);
-        Assert.Equal(new DateOnly(2026, 6, 20), result.InterviewDate);
+        Assert.Equal(new DateTime(2026, 6, 20, 13, 45, 0), result.InterviewDate);
         Assert.Equal("https://findjobs.com/job", result.JobUrl);
         Assert.Equal("I Really want this job!", result.Notes);
     }
@@ -86,7 +86,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         var application = await CreateApplicationAsync(db, user.Id, "Before Company");
         var service = new JobApplicationService(db);
         var appliedDate = new DateOnly(2026, 6, 15);
-        var interviewDate = new DateOnly(2026, 6, 22);
+        var interviewDate = new DateTime(2026, 6, 22, 9, 30, 0);
         var request = new UpdateJobApplicationRequest(
             "After Company",
             "Full Stack Developer",

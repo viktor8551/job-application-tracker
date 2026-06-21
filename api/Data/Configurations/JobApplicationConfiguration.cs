@@ -20,6 +20,9 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
         builder.Property(application => application.Notes)
             .HasMaxLength(3000);
 
+        builder.Property(application => application.InterviewDate)
+            .HasColumnType("timestamp without time zone");
+
         builder.Property(application => application.CreatedAt)
             .HasDefaultValueSql("NOW()");
     }

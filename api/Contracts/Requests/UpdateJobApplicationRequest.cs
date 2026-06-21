@@ -16,7 +16,7 @@ public record UpdateJobApplicationRequest(
 
     DateOnly? AppliedDate = null,
 
-    DateOnly? InterviewDate = null,
+    DateTime? InterviewDate = null,
 
     [MaxLength(2048)]
     string? JobUrl = null,

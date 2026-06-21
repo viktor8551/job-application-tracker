@@ -4,6 +4,7 @@ import {
   statusHasAppliedDate,
   statusHasInterviewDate,
   toDateInputValue,
+  toDateTimeInputValue,
 } from "@/lib/application-utils"
 import {
   deleteApplication,
@@ -50,7 +51,7 @@ export function useApplicationDetail({
     setPositionTitle(applicationToEdit.positionTitle)
     setStatus(applicationToEdit.status)
     setAppliedDate(toDateInputValue(applicationToEdit.appliedDate))
-    setInterviewDate(toDateInputValue(applicationToEdit.interviewDate))
+    setInterviewDate(toDateTimeInputValue(applicationToEdit.interviewDate))
     setJobUrl(applicationToEdit.jobUrl ?? "")
     setNotes(applicationToEdit.notes ?? "")
   }

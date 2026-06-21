@@ -18,7 +18,11 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { applicationStatuses } from "@/lib/application-constants"
-import { normalizeJobUrl, statusHasAppliedDate } from "@/lib/application-utils"
+import {
+  normalizeJobUrl,
+  statusHasAppliedDate,
+  statusHasInterviewDate,
+} from "@/lib/application-utils"
 import type { ApplicationStatus, CreateApplicationRequest } from "@/types/applications"
 import { Field } from "./Field"
 
@@ -35,17 +39,20 @@ export function AddApplicationDialog({
   const [positionTitle, setPositionTitle] = useState("")
   const [status, setStatus] = useState<ApplicationStatus>("Interested")
   const [appliedDate, setAppliedDate] = useState("")
+  const [interviewDate, setInterviewDate] = useState("")
   const [jobUrl, setJobUrl] = useState("")
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const showAppliedDate = statusHasAppliedDate(status)
+  const showInterviewDate = statusHasInterviewDate(status)
 
   function resetForm() {
     setCompanyName("")
     setPositionTitle("")
     setStatus("Interested")
     setAppliedDate("")
+    setInterviewDate("")
     setJobUrl("")
     setNotes("")
     setSubmitError(null)
@@ -63,7 +70,7 @@ export function AddApplicationDialog({
         positionTitle: positionTitle.trim(),
         status,
         appliedDate: showAppliedDate ? appliedDate || null : null,
-        interviewDate: null,
+        interviewDate: showInterviewDate ? interviewDate || null : null,
         jobUrl: normalizeJobUrl(jobUrl),
         notes: notes.trim() || null,
       })
@@ -126,6 +133,10 @@ export function AddApplicationDialog({
                   if (!statusHasAppliedDate(nextStatus)) {
                     setAppliedDate("")
                   }
+
+                  if (!statusHasInterviewDate(nextStatus)) {
+                    setInterviewDate("")
+                  }
                 }}
               >
                 <SelectTrigger>
@@ -147,6 +158,16 @@ export function AddApplicationDialog({
                   value={appliedDate}
                   onChange={(event) => setAppliedDate(event.target.value)}
                   type="date"
+                />
+              </Field>
+            ) : null}
+
+            {showInterviewDate ? (
+              <Field label="Interview date and time (optional)">
+                <Input
+                  value={interviewDate}
+                  onChange={(event) => setInterviewDate(event.target.value)}
+                  type="datetime-local"
                 />
               </Field>
             ) : null}

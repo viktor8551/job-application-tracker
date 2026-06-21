@@ -19,6 +19,20 @@ export function formatDate(date: string | null) {
   }).format(parsedDate)
 }
 
+export function formatDateTime(date: string | null) {
+  const parsedDate = parseDate(date)
+
+  if (!parsedDate) return "-"
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(parsedDate)
+}
+
 export function parseDate(date: string | null) {
   if (!date) return null
 
@@ -58,6 +72,21 @@ export function toDateInputValue(date: string | null) {
     return date
 
   return parsedDate.toISOString().slice(0, 10)
+}
+
+export function toDateTimeInputValue(date: string | null) {
+  const parsedDate = parseDate(date)
+  if (!parsedDate) return ""
+
+  return [
+    parsedDate.getFullYear(),
+    padDatePart(parsedDate.getMonth() + 1),
+    padDatePart(parsedDate.getDate()),
+  ].join("-") + `T${padDatePart(parsedDate.getHours())}:${padDatePart(parsedDate.getMinutes())}`
+}
+
+function padDatePart(value: number) {
+  return value.toString().padStart(2, "0")
 }
 
 export function normalizeJobUrl(url: string) {
