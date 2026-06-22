@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
-import { ApplicationList } from "@/components/dashboard/ApplicationList"
+import { ApplicationList } from "@/components/applications/ApplicationList"
 import { Input } from "@/components/ui/input"
 import { filterStatuses } from "@/lib/application-constants"
 import { cn } from "@/lib/utils"

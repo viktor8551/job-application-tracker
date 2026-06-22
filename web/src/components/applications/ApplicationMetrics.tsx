@@ -4,9 +4,9 @@ import {
   CalendarCheckIcon,
   TrendUpIcon,
 } from "@phosphor-icons/react"
-import { MetricCard } from "@/components/dashboard/MetricCard"
+import { ApplicationMetricCard } from "@/components/applications/ApplicationMetricCard"
 
-export function DashboardMetrics({
+export function ApplicationMetrics({
   trackedCount,
   activeCount,
   appliedCount,
@@ -21,25 +21,25 @@ export function DashboardMetrics({
 }) {
   return (
     <section className="grid gap-3 py-5 sm:grid-cols-2 xl:grid-cols-4">
-      <MetricCard
+      <ApplicationMetricCard
         icon={<BriefcaseIcon />}
         label="Tracked roles"
         value={trackedCount.toString()}
         detail="All applications"
       />
-      <MetricCard
+      <ApplicationMetricCard
         icon={<TrendUpIcon />}
         label="Active"
         value={activeCount.toString()}
         detail="Applied or later"
       />
-      <MetricCard
+      <ApplicationMetricCard
         icon={<ArrowSquareOutIcon />}
         label="Applied"
         value={appliedCount.toString()}
         detail="Waiting for response"
       />
-      <MetricCard
+      <ApplicationMetricCard
         icon={<CalendarCheckIcon />}
         label="Interviews"
         value={interviewCount.toString()}

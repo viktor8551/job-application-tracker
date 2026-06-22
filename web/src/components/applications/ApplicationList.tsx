@@ -1,14 +1,10 @@
+import { ApplicationActionsMenu } from "@/components/applications/ApplicationActionsMenu"
 import { StatusBadge } from "@/components/applications/StatusBadge"
 import { formatDate } from "@/lib/application-utils"
 import type { JobApplication } from "@/types/applications"
-import { ApplicationActionsMenu } from "./ApplicationActionsMenu"
 
 function ApplicationMessage({ message }: { message: string }) {
-  return (
-    <div className="px-4 py-8 text-center text-sm text-zinc-500">
-      {message}
-    </div>
-  )
+  return <div className="px-4 py-8 text-center text-sm text-zinc-500">{message}</div>
 }
 
 export function ApplicationList({
@@ -89,11 +85,11 @@ function ApplicationRow({
       </div>
 
       <div className="mt-3 md:mt-0">
-        <StatusBadge status={application.status}/>
+        <StatusBadge status={application.status} />
       </div>
 
-      <ApplicationDate label="Applied" value={application.appliedDate}/>
-      <ApplicationDate label="Created" value={application.createdAt}/>
+      <ApplicationDate label="Applied" value={application.appliedDate} />
+      <ApplicationDate label="Created" value={application.createdAt} />
 
       <div className="absolute top-4 right-4 md:static md:block">
         <ApplicationActionsMenu

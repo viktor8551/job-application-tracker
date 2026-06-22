@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-export function MetricCard({
+export function ApplicationMetricCard({
   icon,
   label,
   value,
@@ -26,4 +26,3 @@ export function MetricCard({
     </article>
   )
 }
-
