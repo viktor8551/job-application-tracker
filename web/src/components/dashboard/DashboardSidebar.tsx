@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils"
 
-export function DashboardSidebar() {
+type DashboardSection = "Applications" | "Calendar"
+
+export function DashboardSidebar({
+  activeSection,
+  onNavigate,
+}: {
+  activeSection: DashboardSection
+  onNavigate: (section: DashboardSection) => void
+}) {
   return (
     <aside className="border-b border-zinc-200 bg-white px-4 py-4 lg:min-h-screen lg:w-64 lg:border-r lg:border-b-0 lg:px-5">
       <div className="flex items-center justify-between lg:block">
@@ -11,12 +19,13 @@ export function DashboardSidebar() {
       </div>
 
       <nav className="mt-6 flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
-        {["Applications", "Calendar"].map((item) => (
+        {(["Applications", "Calendar"] as const).map((item) => (
           <button
             key={item}
+            onClick={() => onNavigate(item)}
             className={cn(
               "h-9 shrink-0 cursor-pointer border px-3 text-left text-sm transition-colors",
-              item === "Applications"
+              item === activeSection
                 ? "border-zinc-950 bg-zinc-950 text-white"
                 : "border-transparent text-zinc-600 hover:border-zinc-200 hover:bg-zinc-50"
             )}

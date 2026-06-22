@@ -1,4 +1,5 @@
 import { ArrowLeftIcon } from "@phosphor-icons/react"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import { DeleteApplicationDialog } from "@/components/applications/DeleteApplicationDialog"
 import { Button } from "@/components/ui/button"
 import { useApplicationDetail } from "@/hooks/useApplicationDetail"
@@ -10,22 +11,33 @@ import {
   SaveStatus,
 } from "@/components/applications/ApplicationDetailSections"
 
-export function ApplicationDetailPage({
-  applicationId,
-  onBack,
-}: {
-  applicationId: number
-  onBack: () => void
-}) {
+export function ApplicationDetailPage() {
+  const { applicationId } = useParams()
+  const parsedApplicationId = Number(applicationId)
+
+  if (!Number.isInteger(parsedApplicationId) || parsedApplicationId <= 0) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return <ApplicationDetailContent applicationId={parsedApplicationId} />
+}
+
+function ApplicationDetailContent({ applicationId }: { applicationId: number }) {
+  const navigate = useNavigate()
+
+  function navigateBack() {
+    navigate("/dashboard")
+  }
+
   const detail = useApplicationDetail({
     applicationId,
-    onDeleted: onBack,
+    onDeleted: navigateBack,
   })
 
   return (
     <main className="min-h-screen bg-[#f7f7f4] px-4 py-5 text-zinc-950 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-5xl">
-        <Button type="button" variant="ghost" onClick={onBack}>
+        <Button type="button" variant="ghost" onClick={navigateBack}>
           <ArrowLeftIcon />
           Back
         </Button>
