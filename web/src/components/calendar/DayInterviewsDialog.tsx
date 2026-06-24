@@ -11,15 +11,17 @@ import { isPastInterview } from "@/lib/calendar-utils"
 import type { JobApplication } from "@/types/applications"
 import type { SelectedInterviewDay } from "@/types/calendar"
 
+type DayInterviewsDialogProps = {
+  selectedDay: SelectedInterviewDay | null
+  onClose: () => void
+  onSelectInterview: (application: JobApplication) => void
+}
+
 export function DayInterviewsDialog({
   selectedDay,
   onClose,
   onSelectInterview,
-}: {
-  selectedDay: SelectedInterviewDay | null
-  onClose: () => void
-  onSelectInterview: (application: JobApplication) => void
-}) {
+}: DayInterviewsDialogProps) {
   const today = new Date()
   const dayLabel = selectedDay
     ? new Intl.DateTimeFormat("en", {

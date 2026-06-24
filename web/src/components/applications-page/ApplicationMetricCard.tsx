@@ -1,16 +1,18 @@
 import type { ReactNode } from "react"
 
+type ApplicationMetricCardProps = {
+  icon: ReactNode
+  label: string
+  value: string
+  detail: string
+}
+
 export function ApplicationMetricCard({
   icon,
   label,
   value,
   detail,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-  detail: string
-}) {
+}: ApplicationMetricCardProps) {
   return (
     <article className="border border-zinc-200 bg-white p-4">
       <div className="flex items-start justify-between gap-3">

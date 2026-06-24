@@ -29,4 +29,3 @@ export type CreateApplicationRequest = {
 }
 
 export type UpdateApplicationRequest = CreateApplicationRequest
-

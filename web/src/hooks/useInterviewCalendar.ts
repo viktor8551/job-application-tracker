@@ -1,39 +1,17 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { parseDate } from "@/lib/application-utils"
-import { getApplications } from "@/services/applications"
+import { useApplicationsQuery } from "@/queries/applications"
 import type { JobApplication } from "@/types/applications"
 
+const EMPTY_APPLICATION_LIST: JobApplication[] = []
+
 export function useInterviewCalendar() {
-  const [applications, setApplications] = useState<JobApplication[]>([])
+  const applicationsQuery = useApplicationsQuery()
+  const applications = applicationsQuery.data ?? EMPTY_APPLICATION_LIST
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const today = new Date()
     return new Date(today.getFullYear(), today.getMonth(), 1)
   })
-  const [isLoading, setIsLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  useEffect(() => {
-    const abortController = new AbortController()
-
-    async function loadApplications() {
-      try {
-        setIsLoading(true)
-        setErrorMessage(null)
-        setApplications(await getApplications(abortController.signal))
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") return
-        setErrorMessage("Could not load interviews.")
-      } finally {
-        if (!abortController.signal.aborted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    loadApplications()
-
-    return () => abortController.abort()
-  }, [])
 
   const interviews = useMemo(() => {
     return applications
@@ -61,17 +39,19 @@ export function useInterviewCalendar() {
   }, [interviews, visibleMonth])
 
   function showPreviousMonth() {
-    setVisibleMonth((currentMonth) => new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
+    setVisibleMonth((currentMonth) =>
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
   }
 
   function showNextMonth() {
-    setVisibleMonth((currentMonth) => new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
+    setVisibleMonth((currentMonth) =>
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
   }
 
   return {
-    errorMessage,
     interviews,
-    isLoading,
+    isLoading: applicationsQuery.isPending,
+    errorMessage: applicationsQuery.isError ? "Could not load interviews." : null,
     visibleMonth,
     visibleMonthInterviews,
     showNextMonth,

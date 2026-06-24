@@ -11,19 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export function ApplicationActionsMenu({
-  isOpen,
-  onOpenChange,
-  onOpen,
-  onDelete,
-}: {
-  isOpen: boolean
-  onOpenChange: (isOpen: boolean) => void
+type ApplicationActionsMenuProps = {
   onOpen: () => void
   onDelete: () => void
-}) {
+}
+
+export function ApplicationActionsMenu({ onOpen, onDelete }: ApplicationActionsMenuProps) {
   return (
-    <DropdownMenu modal={false} open={isOpen} onOpenChange={onOpenChange}>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

@@ -9,19 +9,21 @@ import {
 } from "@/components/ui/dialog"
 import type { JobApplication } from "@/types/applications"
 
+type DeleteApplicationDialogProps = {
+  application: JobApplication | null
+  errorMessage: string | null
+  isDeleting: boolean
+  onCancel: () => void
+  onConfirm: () => void
+}
+
 export function DeleteApplicationDialog({
   application,
   errorMessage,
   isDeleting,
   onCancel,
   onConfirm,
-}: {
-  application: JobApplication | null
-  errorMessage: string | null
-  isDeleting: boolean
-  onCancel: () => void
-  onConfirm: () => void
-}) {
+}: DeleteApplicationDialogProps) {
   return (
     <Dialog open={application !== null} onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="max-w-md">
@@ -34,11 +36,11 @@ export function DeleteApplicationDialog({
         </DialogHeader>
 
         <div className="space-y-4 p-4">
-          {errorMessage ? (
+          {errorMessage && (
             <p className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
               {errorMessage}
             </p>
-          ) : null}
+          )}
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { CalendarMonth } from "@/components/calendar/CalendarMonth"
 import { DayInterviewsDialog } from "@/components/calendar/DayInterviewsDialog"
 import { InterviewDetailsDialog } from "@/components/calendar/InterviewDetailsDialog"
+import { StateMessage } from "@/components/ui/state-message"
 import { useInterviewCalendar } from "@/hooks/useInterviewCalendar"
 import type { SelectedInterviewDay } from "@/types/calendar"
 import type { JobApplication } from "@/types/applications"
@@ -24,15 +25,15 @@ export function CalendarPage() {
 
       <section className="mt-5">
         <div className="border border-zinc-200 bg-white">
-          {calendar.isLoading ? (
-            <CalendarMessage message="Loading interviews..." />
-          ) : null}
+          {calendar.isLoading && (
+            <StateMessage message="Loading interviews..." />
+          )}
 
-          {calendar.errorMessage ? (
-            <CalendarMessage message={calendar.errorMessage} />
-          ) : null}
+          {calendar.errorMessage && (
+            <StateMessage message={calendar.errorMessage} />
+          )}
 
-          {!calendar.isLoading && !calendar.errorMessage ? (
+          {!calendar.isLoading && !calendar.errorMessage && (
             <CalendarMonth
               visibleMonth={calendar.visibleMonth}
               interviews={calendar.visibleMonthInterviews}
@@ -41,7 +42,7 @@ export function CalendarPage() {
               onSelectInterview={setSelectedInterview}
               onSelectInterviewDay={setSelectedInterviewDay}
             />
-          ) : null}
+          )}
         </div>
       </section>
 
@@ -64,8 +65,4 @@ export function CalendarPage() {
       />
     </>
   )
-}
-
-function CalendarMessage({ message }: { message: string }) {
-  return <p className="px-4 py-8 text-center text-sm text-zinc-500">{message}</p>
 }

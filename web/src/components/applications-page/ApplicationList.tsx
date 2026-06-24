@@ -1,39 +1,54 @@
-import { ApplicationActionsMenu } from "@/components/applications/ApplicationActionsMenu"
-import { StatusBadge } from "@/components/applications/StatusBadge"
+import { useNavigate } from "react-router-dom"
+import { StatusBadge } from "@/components/application/StatusBadge"
+import { ApplicationActionsMenu } from "@/components/applications-page/ApplicationActionsMenu"
+import { StateMessage } from "@/components/ui/state-message"
 import { formatDate } from "@/lib/application-utils"
 import type { JobApplication } from "@/types/applications"
 
-function ApplicationMessage({ message }: { message: string }) {
-  return <div className="px-4 py-8 text-center text-sm text-zinc-500">{message}</div>
+type ApplicationListProps = {
+  applications: JobApplication[]
+  isLoading: boolean
+  errorMessage: string | null
+  onRequestDelete: (application: JobApplication) => void
+}
+
+type ApplicationRowProps = {
+  application: JobApplication
+  onOpenApplication: () => void
+  onRequestDelete: () => void
+}
+
+type ApplicationDateProps = {
+  label: string
+  value: string | null
 }
 
 export function ApplicationList({
   applications,
   isLoading,
   errorMessage,
-  onOpenApplication,
-  openActionMenuId,
-  onActionMenuOpenChange,
   onRequestDelete,
-}: {
-  applications: JobApplication[]
-  isLoading: boolean
-  errorMessage: string | null
-  onOpenApplication: (applicationId: number) => void
-  openActionMenuId: number | null
-  onActionMenuOpenChange: (applicationId: number, isOpen: boolean) => void
-  onRequestDelete: (application: JobApplication) => void
-}) {
+}: ApplicationListProps) {
+  const navigate = useNavigate()
+
+  function handleRequestDelete(application: JobApplication) {
+    onRequestDelete(application)
+  }
+
+  function handleOpenApplication(applicationId: number) {
+    navigate(`/applications/${applicationId}`)
+  }
+
   if (isLoading) {
-    return <ApplicationMessage message="Loading applications..." />
+    return <StateMessage message="Loading applications..." />
   }
 
   if (errorMessage) {
-    return <ApplicationMessage message={errorMessage} />
+    return <StateMessage message={errorMessage} />
   }
 
   if (applications.length === 0) {
-    return <ApplicationMessage message="No applications found." />
+    return <StateMessage message="No applications found." />
   }
 
   return (
@@ -42,12 +57,8 @@ export function ApplicationList({
         <ApplicationRow
           key={application.id}
           application={application}
-          onOpenApplication={() => onOpenApplication(application.id)}
-          isActionMenuOpen={openActionMenuId === application.id}
-          onActionMenuOpenChange={(isOpen) =>
-            onActionMenuOpenChange(application.id, isOpen)
-          }
-          onRequestDelete={() => onRequestDelete(application)}
+          onOpenApplication={() => handleOpenApplication(application.id)}
+          onRequestDelete={() => handleRequestDelete(application)}
         />
       ))}
     </div>
@@ -57,16 +68,8 @@ export function ApplicationList({
 function ApplicationRow({
   application,
   onOpenApplication,
-  isActionMenuOpen,
-  onActionMenuOpenChange,
   onRequestDelete,
-}: {
-  application: JobApplication
-  onOpenApplication: () => void
-  isActionMenuOpen: boolean
-  onActionMenuOpenChange: (isOpen: boolean) => void
-  onRequestDelete: () => void
-}) {
+}: ApplicationRowProps) {
   return (
     <div className="relative p-4 md:grid md:grid-cols-[1.6fr_1fr_0.9fr_1fr_0.4fr] md:items-center md:border-b md:border-zinc-100 md:px-4 md:py-3 md:last:border-b-0">
       <div className="min-w-0 pr-10 md:pr-0">
@@ -93,8 +96,6 @@ function ApplicationRow({
 
       <div className="absolute top-4 right-4 md:static md:block">
         <ApplicationActionsMenu
-          isOpen={isActionMenuOpen}
-          onOpenChange={onActionMenuOpenChange}
           onOpen={onOpenApplication}
           onDelete={onRequestDelete}
         />
@@ -103,13 +104,7 @@ function ApplicationRow({
   )
 }
 
-function ApplicationDate({
-  label,
-  value,
-}: {
-  label: string
-  value: string | null
-}) {
+function ApplicationDate({ label, value }: ApplicationDateProps) {
   return (
     <div className="mt-4 inline-block w-1/2 pr-3 text-xs md:mt-0 md:block md:w-auto md:pr-0 md:text-sm md:text-zinc-600">
       <p className="text-zinc-500 md:hidden">{label}</p>

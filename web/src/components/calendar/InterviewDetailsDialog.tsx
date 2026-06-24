@@ -11,15 +11,17 @@ import { formatDateTime } from "@/lib/application-utils"
 import { isPastInterview } from "@/lib/calendar-utils"
 import type { JobApplication } from "@/types/applications"
 
+type InterviewDetailsDialogProps = {
+  application: JobApplication | null
+  onClose: () => void
+  onOpenApplication: (applicationId: number) => void
+}
+
 export function InterviewDetailsDialog({
   application,
   onClose,
   onOpenApplication,
-}: {
-  application: JobApplication | null
-  onClose: () => void
-  onOpenApplication: (applicationId: number) => void
-}) {
+}: InterviewDetailsDialogProps) {
   const isPast = application ? isPastInterview(application, new Date()) : false
 
   return (
@@ -35,7 +37,7 @@ export function InterviewDetailsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {application ? (
+        {application && (
           <div>
             <div className="px-4 py-5">
               <p className="text-xs font-medium uppercase text-zinc-500">
@@ -62,11 +64,11 @@ export function InterviewDetailsDialog({
                   <p className="text-sm font-semibold text-zinc-950">
                     {formatDateTime(application.interviewDate)}
                   </p>
-                  {isPast ? (
+                  {isPast && (
                     <p className="text-xs font-medium text-orange-700">
                       Past interview
                     </p>
-                  ) : null}
+                  )}
                 </div>
               </div>
             </div>
@@ -84,7 +86,7 @@ export function InterviewDetailsDialog({
               </Button>
             </div>
           </div>
-        ) : null}
+        )}
       </DialogContent>
     </Dialog>
   )

@@ -1,11 +1,11 @@
 import { PlusIcon } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 
-export function ApplicationsHeader({
-  onAddApplication,
-}: {
+type ApplicationsHeaderProps = {
   onAddApplication: () => void
-}) {
+}
+
+export function ApplicationsHeader({ onAddApplication }: ApplicationsHeaderProps) {
   return (
     <header className="flex flex-col gap-4 border-b border-zinc-200 pb-5 md:flex-row md:items-end md:justify-between">
       <div>

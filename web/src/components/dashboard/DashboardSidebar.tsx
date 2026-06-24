@@ -1,14 +1,15 @@
 import { cn } from "@/lib/utils"
+import {
+  dashboardNavigationItems,
+  type DashboardPage,
+} from "@/lib/dashboard-navigation"
 
-type DashboardSection = "Applications" | "Calendar"
+type DashboardSidebarProps = {
+  activePage: DashboardPage
+  onNavigate: (page: DashboardPage) => void
+}
 
-export function DashboardSidebar({
-  activeSection,
-  onNavigate,
-}: {
-  activeSection: DashboardSection
-  onNavigate: (section: DashboardSection) => void
-}) {
+export function DashboardSidebar({ activePage, onNavigate }: DashboardSidebarProps) {
   return (
     <aside className="border-b border-zinc-200 bg-white px-4 py-4 lg:min-h-screen lg:w-64 lg:border-r lg:border-b-0 lg:px-5">
       <div className="flex items-center justify-between lg:block">
@@ -19,18 +20,18 @@ export function DashboardSidebar({
       </div>
 
       <nav className="mt-6 flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
-        {(["Applications", "Calendar"] as const).map((item) => (
+        {dashboardNavigationItems.map((item) => (
           <button
-            key={item}
-            onClick={() => onNavigate(item)}
+            key={item.id}
+            onClick={() => onNavigate(item.id)}
             className={cn(
               "h-9 shrink-0 cursor-pointer border px-3 text-left text-sm transition-colors",
-              item === activeSection
+              item.id === activePage
                 ? "border-zinc-950 bg-zinc-950 text-white"
                 : "border-transparent text-zinc-600 hover:border-zinc-200 hover:bg-zinc-50"
             )}
           >
-            {item}
+            {item.label}
           </button>
         ))}
       </nav>
