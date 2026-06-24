@@ -8,9 +8,9 @@ import { NotFoundPage } from "@/pages/NotFoundPage"
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
+      <Route path="/" element={<Navigate to="/applications" replace/>}/>
       <Route element={<DashboardLayout/>}>
-        <Route path="/dashboard" element={<ApplicationsPage/>}/>
+        <Route path="/applications" element={<ApplicationsPage/>}/>
         <Route path="/calendar" element={<CalendarPage/>}/>
       </Route>
       <Route path="/applications/:applicationId" element={<ApplicationDetailPage/>}/>

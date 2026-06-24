@@ -11,7 +11,7 @@ export function NotFoundPage() {
         <h1 className="mt-2 text-2xl font-semibold">
           This route does not exist.
         </h1>
-        <Button className="mt-4" onClick={() => navigate("/dashboard")}>
+        <Button className="mt-4" onClick={() => navigate("/applications")}>
           Go to dashboard
         </Button>
       </section>

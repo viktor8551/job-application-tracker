@@ -13,7 +13,7 @@ export function ApplicationDetailPage() {
   const parsedApplicationId = Number(applicationId)
 
   if (!Number.isInteger(parsedApplicationId) || parsedApplicationId <= 0) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to="/applications" replace />
   }
 
   return <ApplicationDetailContent applicationId={parsedApplicationId} />
@@ -37,7 +37,7 @@ function ApplicationDetailContent({ applicationId }: { applicationId: number }) 
   return (
     <main className="min-h-screen bg-[#f7f7f4] px-4 py-5 text-zinc-950 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-5xl">
-        <Button type="button" variant="ghost" onClick={() => navigate("/dashboard")}>
+        <Button type="button" variant="ghost" onClick={() => navigate("/applications")}>
           <ArrowLeftIcon />
           Back
         </Button>

@@ -10,7 +10,7 @@ export const dashboardNavigationItems: DashboardNavigationItem[] = [
   {
     id: "applications",
     label: "Applications",
-    path: "/dashboard",
+    path: "/applications",
   },
   {
     id: "calendar",

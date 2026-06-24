@@ -31,7 +31,7 @@ export function ApplicationDetailHeader({ application }: ApplicationDetailHeader
   async function confirmDelete() {
     try {
       await deleteApplication.mutateAsync(application.id)
-      navigate("/dashboard")
+      navigate("/applications")
     } catch {
       // The dialog renders the mutation error state
     }
