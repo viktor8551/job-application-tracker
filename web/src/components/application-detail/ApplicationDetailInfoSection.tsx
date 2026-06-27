@@ -15,6 +15,7 @@ import { applicationStatuses } from "@/lib/application-constants"
 import {
   formatDate,
   formatDateTime,
+  isValidJobUrl,
   normalizeJobUrl,
   statusHasAppliedDate,
   statusHasInterviewDate,
@@ -94,6 +95,11 @@ export function ApplicationDetailInfoSection({
 
     if (!companyName.trim() || !positionTitle.trim()) {
       setFormError("Company and position are required.")
+      return
+    }
+
+    if (!isValidJobUrl(jobUrl)) {
+      setFormError("Enter a valid job URL, such as example.com/job.")
       return
     }
 
@@ -195,7 +201,10 @@ export function ApplicationDetailInfoSection({
             >
               <Input
                 value={jobUrl}
-                onChange={(event) => setJobUrl(event.target.value)}
+                onChange={(event) => {
+                  setJobUrl(event.target.value)
+                  setFormError(null)
+                }}
                 type="text"
                 maxLength={2048}
               />

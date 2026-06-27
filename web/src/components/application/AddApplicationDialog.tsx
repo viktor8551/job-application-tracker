@@ -21,6 +21,7 @@ import {
 import type { ApplicationStatus } from "@/types/applications"
 import { applicationStatuses } from "@/lib/application-constants"
 import {
+  isValidJobUrl,
   normalizeJobUrl,
   statusHasAppliedDate,
   statusHasInterviewDate,
@@ -58,6 +59,11 @@ export function AddApplicationDialog({ isOpen, onClose }: AddApplicationDialogPr
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
     event.preventDefault()
+
+    if (!isValidJobUrl(jobUrl)) {
+      setSubmitError("Enter a valid job URL, such as example.com/job.")
+      return
+    }
 
     try {
       setSubmitError(null)
@@ -171,7 +177,10 @@ export function AddApplicationDialog({ isOpen, onClose }: AddApplicationDialogPr
           <FormField label="Job URL">
             <Input
               value={jobUrl}
-              onChange={(event) => setJobUrl(event.target.value)}
+              onChange={(event) => {
+                setJobUrl(event.target.value)
+                setSubmitError(null)
+              }}
               type="text"
               maxLength={2048}
             />
