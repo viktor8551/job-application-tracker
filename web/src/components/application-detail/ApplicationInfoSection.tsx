@@ -28,17 +28,17 @@ import type {
   JobApplication,
 } from "@/types/applications"
 
-type ApplicationDetailInfoSectionProps = {
+type ApplicationInfoSectionProps = {
   application: JobApplication
   onHideSaveStatus: () => void
   onSaved: () => void
 }
 
-export function ApplicationDetailInfoSection({
+export function ApplicationInfoSection({
   application,
   onHideSaveStatus,
   onSaved,
-}: ApplicationDetailInfoSectionProps) {
+}: ApplicationInfoSectionProps) {
   const updateApplication = useUpdateApplicationMutation(application.id)
   const [isEditing, setIsEditing] = useState(false)
   const [companyName, setCompanyName] = useState(application.companyName)

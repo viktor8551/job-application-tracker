@@ -8,11 +8,11 @@ import { formatDate } from "@/lib/application-utils"
 import { useDeleteApplicationMutation } from "@/queries/applications"
 import type { JobApplication } from "@/types/applications"
 
-type ApplicationDetailHeaderProps = {
+type ApplicationHeaderProps = {
   application: JobApplication
 }
 
-export function ApplicationDetailHeader({ application }: ApplicationDetailHeaderProps) {
+export function ApplicationHeader({ application }: ApplicationHeaderProps) {
   const navigate = useNavigate()
   const deleteApplication = useDeleteApplicationMutation()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)

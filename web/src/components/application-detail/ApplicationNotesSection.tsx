@@ -7,17 +7,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { useUpdateApplicationMutation } from "@/queries/applications"
 import type { JobApplication } from "@/types/applications"
 
-type ApplicationDetailNotesSectionProps = {
+type ApplicationNotesSectionProps = {
   application: JobApplication
   onHideSaveStatus: () => void
   onSaved: () => void
 }
 
-export function ApplicationDetailNotesSection({
+export function ApplicationNotesSection({
   application,
   onHideSaveStatus,
   onSaved,
-}: ApplicationDetailNotesSectionProps) {
+}: ApplicationNotesSectionProps) {
   const updateApplication = useUpdateApplicationMutation(application.id)
   const [isEditing, setIsEditing] = useState(false)
   const [notes, setNotes] = useState(application.notes ?? "")

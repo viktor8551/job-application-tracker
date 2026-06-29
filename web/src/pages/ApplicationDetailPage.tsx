@@ -1,9 +1,9 @@
 import { ArrowLeftIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
-import { ApplicationDetailHeader } from "@/components/application-detail/ApplicationDetailHeader"
-import { ApplicationDetailInfoSection } from "@/components/application-detail/ApplicationDetailInfoSection"
-import { ApplicationDetailNotesSection } from "@/components/application-detail/ApplicationDetailNotesSection"
+import { ApplicationHeader } from "@/components/application-detail/ApplicationHeader"
+import { ApplicationInfoSection } from "@/components/application-detail/ApplicationInfoSection"
+import { ApplicationNotesSection } from "@/components/application-detail/ApplicationNotesSection"
 import { Button } from "@/components/ui/button"
 import { StateMessage } from "@/components/ui/state-message"
 import { useApplicationQuery } from "@/queries/applications"
@@ -54,17 +54,17 @@ function ApplicationDetailContent({ applicationId }: { applicationId: number }) 
           <div className="mt-4 space-y-5">
             <SaveStatus isVisible={showSaveStatus} />
 
-            <ApplicationDetailHeader
+            <ApplicationHeader
               application={applicationQuery.data}
             />
 
-            <ApplicationDetailInfoSection
+            <ApplicationInfoSection
               application={applicationQuery.data}
               onHideSaveStatus={() => setShowSaveStatus(false)}
               onSaved={() => setShowSaveStatus(true)}
             />
 
-            <ApplicationDetailNotesSection
+            <ApplicationNotesSection
               application={applicationQuery.data}
               onHideSaveStatus={() => setShowSaveStatus(false)}
               onSaved={() => setShowSaveStatus(true)}
