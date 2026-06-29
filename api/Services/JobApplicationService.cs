@@ -14,6 +14,7 @@ public class JobApplicationService(
     public async Task<JobApplicationResponse?> UpdateJobApplicationAsync(int id, UpdateJobApplicationRequest request, int userId)
     {
         var application = await _db.JobApplications
+            .Include(application => application.Attachments)
             .FirstOrDefaultAsync(application => application.Id == id && application.UserId == userId);
 
         if (application is null)
@@ -72,19 +73,22 @@ public class JobApplicationService(
 
     public async Task<JobApplicationResponse?> GetJobApplicationByIdAsync(int id, int userId)
     {
-        return await _db.JobApplications
-            .Where(application => application.Id == id && application.UserId == userId)
-            .Select(application => ToResponse(application))
-            .FirstOrDefaultAsync();
+        var application = await _db.JobApplications
+            .Include(application => application.Attachments)
+            .FirstOrDefaultAsync(application => application.Id == id && application.UserId == userId);
+
+        return application is null ? null : ToResponse(application);
     }
 
     public async Task<List<JobApplicationResponse>> GetJobApplicationsAsync(int userId)
     {
-        return await _db.JobApplications
+        var applications = await _db.JobApplications
+            .Include(application => application.Attachments)
             .Where(application => application.UserId == userId)
             .OrderByDescending(application => application.CreatedAt)
-            .Select(application => ToResponse(application))
             .ToListAsync();
+
+        return [.. applications.Select(ToResponse)];
     }
 
     private static JobApplicationResponse ToResponse(JobApplication application)
@@ -98,7 +102,15 @@ public class JobApplicationService(
             application.InterviewDate,
             application.JobUrl,
             application.Notes,
-            application.CreatedAt
+            application.CreatedAt,
+            [..application.Attachments
+                .Select(attachment => new ApplicationAttachmentResponse(
+                    attachment.Id,
+                    attachment.OriginalFileName,
+                    attachment.ContentType,
+                    attachment.SizeBytes,
+                    attachment.UploadedAt
+                ))]
         );
     }
 }

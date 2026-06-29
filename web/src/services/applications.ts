@@ -1,5 +1,7 @@
 import { apiBaseUrl } from "@/lib/application-constants"
 import type {
+  ApplicationAttachment,
+  AttachmentPolicy,
   CreateApplicationRequest,
   JobApplication,
   UpdateApplicationRequest,
@@ -54,4 +56,39 @@ export async function deleteApplication(applicationId: number) {
   })
 
   if (!response.ok) throw new Error("Could not delete application.")
+}
+
+export async function getAttachmentPolicy(signal?: AbortSignal) {
+  const response = await fetch(`${apiBaseUrl}/api/attachment-policy`, { signal })
+  if (!response.ok) throw new Error("Could not load attachment settings.")
+  return (await response.json()) as AttachmentPolicy
+}
+
+export async function uploadApplicationAttachment(applicationId: number, file: File) {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const response = await fetch(`${apiBaseUrl}/api/applications/${applicationId}/attachments`, {
+    method: "POST",
+    body: formData,
+  })
+
+  if (!response.ok) {
+    const message = await response.text()
+    throw new Error(message || "Could not upload file.")
+  }
+
+  return (await response.json()) as ApplicationAttachment
+}
+
+export async function deleteApplicationAttachment(applicationId: number, attachmentId: number) {
+  const response = await fetch(`${apiBaseUrl}/api/applications/${applicationId}/attachments/${attachmentId}`, {
+    method: "DELETE",
+  })
+
+  if (!response.ok) throw new Error("Could not delete file.")
+}
+
+export function getApplicationAttachmentDownloadUrl(applicationId: number, attachmentId: number) {
+  return `${apiBaseUrl}/api/applications/${applicationId}/attachments/${attachmentId}/download`
 }

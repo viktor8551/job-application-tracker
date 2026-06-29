@@ -11,5 +11,6 @@ public class JobApplication {
     public DateTime? InterviewDate { get; set; }
     public string? JobUrl { get; set; }
     public string? Notes { get; set; }
+    public List<ApplicationAttachment> Attachments { get; set; } = [];
     public DateTime CreatedAt { get; set; }
 }

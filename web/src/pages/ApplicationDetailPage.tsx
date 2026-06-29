@@ -7,6 +7,7 @@ import { ApplicationNotesSection } from "@/components/application-detail/Applica
 import { Button } from "@/components/ui/button"
 import { StateMessage } from "@/components/ui/state-message"
 import { useApplicationQuery } from "@/queries/applications"
+import { ApplicationAttachmentsSection } from "@/components/application-detail/ApplicationAttachmentsSection"
 
 export function ApplicationDetailPage() {
   const { applicationId } = useParams()
@@ -68,6 +69,11 @@ function ApplicationDetailContent({ applicationId }: { applicationId: number }) 
               application={applicationQuery.data}
               onHideSaveStatus={() => setShowSaveStatus(false)}
               onSaved={() => setShowSaveStatus(true)}
+            />
+
+            <ApplicationAttachmentsSection
+              applicationId={applicationQuery.data.id}
+              attachments={applicationQuery.data.attachments}
             />
           </div>
         )}

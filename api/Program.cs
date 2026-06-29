@@ -1,5 +1,6 @@
 using api.Data;
 using api.Models;
+using api.Options;
 using api.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -26,7 +27,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions => npgsqlOptions.MapEnum<ApplicationStatus>("application_status")));
 
+builder.Services.AddOptions<AttachmentOptions>()
+    .BindConfiguration("Attachments")
+    .Validate(options => options.MaxFiles > 0, "Attachments:MaxFiles must be greater than zero.")
+    .Validate(options => options.MaxFileSizeMiB > 0, "Attachments:MaxFileSizeMiB must be greater than zero.")
+    .Validate(
+        options => options.AllowedExtensions.Length > 0 &&
+            options.AllowedExtensions.All(extension => extension.StartsWith('.')),
+        "Attachments:AllowedExtensions must contain extensions beginning with a dot."
+    )
+    .ValidateOnStart();
+
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IApplicationAttachmentService, ApplicationAttachmentService>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

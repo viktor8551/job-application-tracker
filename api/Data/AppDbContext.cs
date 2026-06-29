@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<JobApplication> JobApplications { get; set; }
+    public DbSet<ApplicationAttachment> ApplicationAttachments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

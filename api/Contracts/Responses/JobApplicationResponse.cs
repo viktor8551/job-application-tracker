@@ -11,5 +11,6 @@ public record JobApplicationResponse(
     DateTime? InterviewDate,
     string? JobUrl,
     string? Notes,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    List<ApplicationAttachmentResponse> Attachments
 );
