@@ -2,6 +2,8 @@ using api.Data;
 using api.Models;
 using api.Options;
 using api.Services;
+using Azure.Identity;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -39,7 +41,36 @@ builder.Services.AddOptions<AttachmentOptions>()
     .ValidateOnStart();
 
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
-builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+
+var storageProvider = builder.Configuration["Attachments:StorageProvider"];
+if (string.Equals(storageProvider, "AzureBlob", StringComparison.OrdinalIgnoreCase))
+{
+    var accountName = builder.Configuration["AzureBlobStorage:AccountName"];
+    var containerName = builder.Configuration["AzureBlobStorage:ContainerName"];
+
+    if (string.IsNullOrWhiteSpace(accountName) || string.IsNullOrWhiteSpace(containerName))
+    {
+        throw new InvalidOperationException("AzureBlobStorage:AccountName and AzureBlobStorage:ContainerName are required.");
+    }
+
+    builder.Services.AddSingleton(
+        new BlobServiceClient(
+            new Uri($"https://{accountName}.blob.core.windows.net"),
+            new DefaultAzureCredential()
+        )
+    );
+    builder.Services.AddSingleton(serviceProvider =>
+        serviceProvider
+            .GetRequiredService<BlobServiceClient>()
+            .GetBlobContainerClient(containerName)
+    );
+    builder.Services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+}
+
 builder.Services.AddScoped<IApplicationAttachmentService, ApplicationAttachmentService>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
