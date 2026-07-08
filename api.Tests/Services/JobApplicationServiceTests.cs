@@ -2,6 +2,7 @@ using api.Contracts;
 using api.Data;
 using api.Models;
 using api.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Tests.Services;
@@ -21,7 +22,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
     {
         await using var db = fixture.CreateDbContext();
         var user = await CreateUserAsync(db);
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
         var request = new CreateJobApplicationRequest(
             "This Company",
             "Backend Developer",
@@ -54,7 +55,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         await CreateApplicationAsync(db, secondUser.Id, "Other User Company");
         await CreateApplicationAsync(db, firstUser.Id, "Newer Company", createdAt: DateTime.UtcNow);
 
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
 
         var results = await service.GetJobApplicationsAsync(firstUser.Id);
 
@@ -71,7 +72,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         var owner = await CreateUserAsync(db);
         var otherUser = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, owner.Id, "Private Company");
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
 
         var result = await service.GetJobApplicationByIdAsync(application.Id, otherUser.Id);
 
@@ -84,7 +85,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         await using var db = fixture.CreateDbContext();
         var user = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, user.Id, "Before Company");
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
         var appliedDate = new DateOnly(2026, 6, 15);
         var interviewDate = new DateTime(2026, 6, 22, 9, 30, 0);
         var request = new UpdateJobApplicationRequest(
@@ -115,7 +116,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         var owner = await CreateUserAsync(db);
         var otherUser = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, owner.Id, "Private Company");
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
         var request = new UpdateJobApplicationRequest(
             "Nope",
             "Nope",
@@ -132,12 +133,48 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         await using var db = fixture.CreateDbContext();
         var user = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, user.Id, "Company To Delete");
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
 
         var deleted = await service.DeleteJobApplicationAsync(application.Id, user.Id);
 
         Assert.True(deleted);
         Assert.False(await db.JobApplications.AnyAsync());
+    }
+
+    [Fact]
+    public async Task DeleteJobApplicationAsync_RemovesStoredAttachments()
+    {
+        await using var db = fixture.CreateDbContext();
+        var user = await CreateUserAsync(db);
+        var application = await CreateApplicationAsync(db, user.Id, "Company With Attachments");
+        db.ApplicationAttachments.AddRange(
+            new ApplicationAttachment
+            {
+                JobApplicationId = application.Id,
+                OriginalFileName = "resume.pdf",
+                StoredFileName = "stored-resume.pdf",
+                ContentType = "application/pdf",
+                SizeBytes = 100
+            },
+            new ApplicationAttachment
+            {
+                JobApplicationId = application.Id,
+                OriginalFileName = "cover-letter.pdf",
+                StoredFileName = "stored-cover-letter.pdf",
+                ContentType = "application/pdf",
+                SizeBytes = 200
+            }
+        );
+        await db.SaveChangesAsync();
+        var fileStorage = new RecordingFileStorageService();
+        var service = new JobApplicationService(db, fileStorage);
+
+        var deleted = await service.DeleteJobApplicationAsync(application.Id, user.Id);
+
+        Assert.True(deleted);
+        Assert.Contains("stored-resume.pdf", fileStorage.DeletedFileNames);
+        Assert.Contains("stored-cover-letter.pdf", fileStorage.DeletedFileNames);
+        Assert.False(await db.ApplicationAttachments.AnyAsync());
     }
 
     [Fact]
@@ -147,7 +184,7 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         var owner = await CreateUserAsync(db);
         var otherUser = await CreateUserAsync(db);
         var application = await CreateApplicationAsync(db, owner.Id, "Company to Keep");
-        var service = new JobApplicationService(db);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
 
         var deleted = await service.DeleteJobApplicationAsync(application.Id, otherUser.Id);
 
@@ -181,5 +218,30 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         db.JobApplications.Add(application);
         await db.SaveChangesAsync();
         return application;
+    }
+
+    private sealed class RecordingFileStorageService : IFileStorageService
+    {
+        public List<string> DeletedFileNames { get; } = [];
+
+        public Task<string> SaveAsync(IFormFile file, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<Stream?> OpenReadAsync(
+            string storedFileName,
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task DeleteAsync(
+            string storedFileName,
+            CancellationToken cancellationToken = default)
+        {
+            DeletedFileNames.Add(storedFileName);
+            return Task.CompletedTask;
+        }
     }
 }

@@ -6,10 +6,12 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Services;
 
 public class JobApplicationService(
-    AppDbContext db
+    AppDbContext db,
+    IFileStorageService fileStorageService
 ) : IJobApplicationService
 {
     private readonly AppDbContext _db = db;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
 
     public async Task<JobApplicationResponse?> UpdateJobApplicationAsync(int id, UpdateJobApplicationRequest request, int userId)
     {
@@ -38,12 +40,16 @@ public class JobApplicationService(
     public async Task<bool> DeleteJobApplicationAsync(int id, int userId)
     {
         var application = await _db.JobApplications
+            .Include(application => application.Attachments)
             .FirstOrDefaultAsync(application => application.Id == id && application.UserId == userId);
 
         if (application is null)
         {
             return false;
         }
+
+        await Task.WhenAll(application.Attachments.Select(attachment =>
+            _fileStorageService.DeleteAsync(attachment.StoredFileName)));
 
         _db.JobApplications.Remove(application);
         await _db.SaveChangesAsync();
