@@ -1,5 +1,6 @@
 using api.Contracts;
 using api.Data;
+using api.Exceptions;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,8 @@ public class JobApplicationService(
     IFileStorageService fileStorageService
 ) : IJobApplicationService
 {
+    public const int MaxApplicationsPerUser = 500;
+
     private readonly AppDbContext _db = db;
     private readonly IFileStorageService _fileStorageService = fileStorageService;
 
@@ -59,6 +62,18 @@ public class JobApplicationService(
 
     public async Task<JobApplicationResponse> CreateJobApplicationAsync(CreateJobApplicationRequest request, int userId)
     {
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        await _db.Users
+            .FromSqlInterpolated($"SELECT * FROM \"Users\" WHERE \"Id\" = {userId} FOR UPDATE")
+            .SingleAsync();
+
+        var applicationCount = await _db.JobApplications.CountAsync(application => application.UserId == userId);
+
+        if (applicationCount >= MaxApplicationsPerUser)
+        {
+            throw new ApplicationLimitExceededException(MaxApplicationsPerUser);
+        }
+
         var application = new JobApplication
         {
             UserId = userId,
@@ -73,6 +88,7 @@ public class JobApplicationService(
 
         _db.JobApplications.Add(application);
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return ToResponse(application);
     }

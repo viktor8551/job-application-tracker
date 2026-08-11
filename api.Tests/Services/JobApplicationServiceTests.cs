@@ -1,5 +1,6 @@
 using api.Contracts;
 using api.Data;
+using api.Exceptions;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Http;
@@ -42,6 +43,56 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         Assert.Equal(new DateTime(2026, 6, 20, 13, 45, 0), result.InterviewDate);
         Assert.Equal("https://findjobs.com/job", result.JobUrl);
         Assert.Equal("I Really want this job!", result.Notes);
+    }
+
+    [Fact]
+    public async Task CreateJobApplicationAsync_AllowsApplicationAtUserLimit()
+    {
+        await using var db = fixture.CreateDbContext();
+        var user = await CreateUserAsync(db);
+        await CreateApplicationsAsync(db, user.Id, JobApplicationService.MaxApplicationsPerUser - 1);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
+
+        await service.CreateJobApplicationAsync(CreateRequest(), user.Id);
+
+        Assert.Equal(
+            JobApplicationService.MaxApplicationsPerUser,
+            await db.JobApplications.CountAsync(application => application.UserId == user.Id)
+        );
+    }
+
+    [Fact]
+    public async Task CreateJobApplicationAsync_RejectsApplicationAboveUserLimit()
+    {
+        await using var db = fixture.CreateDbContext();
+        var user = await CreateUserAsync(db);
+        await CreateApplicationsAsync(db, user.Id, JobApplicationService.MaxApplicationsPerUser);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
+
+        var exception = await Assert.ThrowsAsync<ApplicationLimitExceededException>(
+            () => service.CreateJobApplicationAsync(CreateRequest(), user.Id)
+        );
+
+        Assert.Equal(JobApplicationService.MaxApplicationsPerUser, exception.MaximumApplications);
+        Assert.Equal(
+            JobApplicationService.MaxApplicationsPerUser,
+            await db.JobApplications.CountAsync(application => application.UserId == user.Id)
+        );
+    }
+
+    [Fact]
+    public async Task CreateJobApplicationAsync_AppliesLimitPerUser()
+    {
+        await using var db = fixture.CreateDbContext();
+        var fullUser = await CreateUserAsync(db);
+        var otherUser = await CreateUserAsync(db);
+        await CreateApplicationsAsync(db, fullUser.Id, JobApplicationService.MaxApplicationsPerUser);
+        var service = new JobApplicationService(db, new RecordingFileStorageService());
+
+        var result = await service.CreateJobApplicationAsync(CreateRequest(), otherUser.Id);
+
+        Assert.NotEqual(0, result.Id);
+        Assert.Equal(1, await db.JobApplications.CountAsync(application => application.UserId == otherUser.Id));
     }
 
     [Fact]
@@ -198,6 +249,21 @@ public sealed class JobApplicationServiceTests(PostgreSqlTestFixture fixture)
         db.Users.Add(user);
         await db.SaveChangesAsync();
         return user;
+    }
+
+    private static CreateJobApplicationRequest CreateRequest() =>
+        new("Company", "Software Developer", ApplicationStatus.Interested);
+
+    private static async Task CreateApplicationsAsync(AppDbContext db, int userId, int count)
+    {
+        db.JobApplications.AddRange(Enumerable.Range(0, count).Select(index => new JobApplication
+        {
+            UserId = userId,
+            CompanyName = $"Company {index}",
+            PositionTitle = "Software Developer",
+            Status = ApplicationStatus.Interested
+        }));
+        await db.SaveChangesAsync();
     }
 
     private static async Task<JobApplication> CreateApplicationAsync(

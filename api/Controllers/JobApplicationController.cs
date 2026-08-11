@@ -1,4 +1,5 @@
 using api.Contracts;
+using api.Exceptions;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +27,21 @@ public class JobApplicationController(
     {
         // TODO: Replace with authenticated user
         const int userId = 1;
-        var application = await _jobApplicationService.CreateJobApplicationAsync(request, userId);
+        try
+        {
+            var application = await _jobApplicationService.CreateJobApplicationAsync(request, userId);
 
-        return CreatedAtAction(nameof(GetById), new { id = application.Id }, application);
+            return CreatedAtAction(nameof(GetById), new { id = application.Id }, application);
+        }
+        catch (ApplicationLimitExceededException exception)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Application limit reached",
+                Detail = exception.Message
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
